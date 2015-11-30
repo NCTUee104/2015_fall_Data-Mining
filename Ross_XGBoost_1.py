@@ -74,7 +74,6 @@ def build_feat(feat, data):
     #data.loc[data['StoreType'] == 'd', 'StoreType'] = '4'
     #data['StoreType'] = data['StoreType'].astype(float)
     
-
     # Assortment
     
     #feat.append('Assortment')
