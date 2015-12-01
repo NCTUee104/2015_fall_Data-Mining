@@ -41,9 +41,6 @@ feat = ['Store', 'CompetitionDistance', 'CompetitionOpenSinceMonth', \
 
 ### feature
 def build_feat(feat, data):
-    #feat.extend(['Store', 'CompetitionDistance', 'CompetitionOpenSinceMonth',
-                #'CompetitionOpenSinceYear', 'Promo', 'Promo2', 'Promo2SinceWeek', 
-               # 'Promo2SinceYear'])
     # School Holiday
     #feat.append('SchoolHoliday')
     data['SchoolHoliday'] = data['SchoolHoliday'].astype(float)
@@ -66,7 +63,6 @@ def build_feat(feat, data):
     data['day'] = data.Date.apply(lambda x: x.split('-')[2]).astype(float)
     
     # Store Type
-    
     #feat.append('StoreType')
     #data.loc[data['StoreType'] == 'a', 'StoreType'] = '1'
     #data.loc[data['StoreType'] == 'b', 'StoreType'] = '2'
@@ -75,7 +71,6 @@ def build_feat(feat, data):
     #data['StoreType'] = data['StoreType'].astype(float)
     
     # Assortment
-    
     #feat.append('Assortment')
     #data.loc[data['Assortment'] == 'a', 'Assortment'] = '1'
     #data.loc[data['Assortment'] == 'b', 'Assortment'] = '2'
@@ -83,18 +78,11 @@ def build_feat(feat, data):
     #data['Assortment'] = data['Assortment'].astype(float)
     data.replace(['0','a', 'b', 'c', 'd'], [0. ,1., 2., 3., 4.], inplace=True)
     
-
-#print feat
 build_feat(feat, train)
-#train.replace(['a', 'b', 'c', 'd'], [1., 2., 3., 4.], inplace=True)
-#print train['StoreType']
 build_feat(feat, test)
 test.fillna(0., inplace=True)
 
-#print test[feat]["Promo2SinceWeek"]
-
 ### Parameter
-
 param = {"objective": "reg:linear",
         "eta": 0.3, # 0.3 
         "max_depth": 20, # 10
@@ -108,15 +96,11 @@ num_tree = 50
 x_train, x_valid = train_test_split(train, test_size = 0.01)
 y_train = np.log1p(x_train.Sales) # np.log(x_train["Sales"] + 1)
 y_valid = np.log1p(x_valid.Sales) # np.log(x_valid["Sales"] + 1)
-#print x_train[feat]
-#print y_train
-#print x_train.dtype()
 d_train = xgb.DMatrix(x_train[feat], y_train)
 d_valid = xgb.DMatrix(x_valid[feat], y_valid)
 
 watch = [(d_valid, 'eval'), (d_train, 'train')]
 bst = xgb.train(param, d_train, num_tree, evals=watch)
-#bst = xgb.train(param, d_train, num_tree, evals=watch, early_stopping_rounds=100, feval=rmspe_xgb, verbose_eval=True)
 
 yhat = bst.predict(xgb.DMatrix(x_valid[feat]))
 error = rmspe(x_valid.Sales.values, np.expm1(yhat))
